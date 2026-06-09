@@ -1,0 +1,16 @@
+{
+  "name": "Web Scraper Agent",
+  "description": "Scrape any web page as clean Markdown using your Chrome browser. Requires Chrome with Frevana extension installed. Auto-installs frevana-cli on first use.",
+  "version": "1.0.0",
+  "prompts": [
+    "Scrape https://news.ycombinator.com and summarize the top 10 stories with links.",
+    "Scrape this URL and extract the main article content as clean Markdown."
+  ],
+  "skills": [
+    {
+      "name": "frevana",
+      "source": "https://github.com/FinpeakInc/frevana-cli",
+      "description": "Control Chrome browser to scrape web pages as Markdown, ask AI platforms questions, and publish to social media. Uses your logged-in browser sessions. Requires Chrome with Frevana extension: download from https://static.frevana.com/app-updates/extension/frevana-extension.zip"
+    }
+  ]
+}
