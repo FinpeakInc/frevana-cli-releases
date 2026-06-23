@@ -38,6 +38,7 @@ Tools:
   frevana_scrape   Scrape a web page as Markdown
   frevana_ask      Ask an AI platform a question
   frevana_x_search_topic  Search X (Twitter) posts by topic
+  frevana_meta_ads_search  Search Meta Ads Library
   frevana_publish  Publish to Twitter/Facebook/LinkedIn
   frevana_status   Check Chrome connection status
 
@@ -45,6 +46,7 @@ Examples:
   bash scripts/frevana-call.sh frevana_scrape '{"url":"https://example.com","provider":"url"}'
   bash scripts/frevana-call.sh frevana_ask '{"provider":"chatgpt","prompt":"what is AI?"}'
   bash scripts/frevana-call.sh frevana_x_search_topic '{"topic":"vibe coding","sort":"top","count":10,"fetchMode":"full","timeout":60000}'
+  bash scripts/frevana-call.sh frevana_meta_ads_search '{"keyword":"frevana","country":"CN","active_status":"active","maxResults":10}'
   bash scripts/frevana-call.sh frevana_publish '{"provider":"twitter","text":"Hello!"}'
   bash scripts/frevana-call.sh frevana_status '{}'
 

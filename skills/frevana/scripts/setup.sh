@@ -52,6 +52,11 @@ FREVANA_STATE="$HOME/.frevana"
 FREVANA_BIN_DIR="$FREVANA_STATE/bin"
 DAEMON_PORT="${FREVANA_PORT:-12306}"
 LOCKFILE="/tmp/frevana-setup.lock"
+UPDATE_CHECK_FILE="$HOME/.config/frevana/skill-setup-update-check"
+UPDATE_CHECK_TTL_SEC="${FREVANA_SETUP_UPDATE_TTL_SEC:-21600}"
+case "$UPDATE_CHECK_TTL_SEC" in
+  ''|*[!0-9]*) UPDATE_CHECK_TTL_SEC=21600 ;;
+esac
 RELEASES_REPO="FinpeakInc/frevana-cli-releases"
 # Download URLs use GitHub's /releases/{latest|tag/<ver>}/download/<file>
 # redirect (302 → asset CDN). This deliberately avoids api.github.com because
@@ -223,6 +228,31 @@ PLATFORM_KEY=$(detect_platform)
 case "$PLATFORM_KEY" in *win32*) BIN_EXT=".exe" ;; *) BIN_EXT="" ;; esac
 FREVANA_BIN="${FREVANA_BIN_DIR}/frevana${BIN_EXT}"
 
+# Existing binaries from before setup-host owned auto-upgrades (including
+# 1.1.5) can still run `frevana update`. Use that compatibility path before
+# setup-host, so the daemon is subsequently started by the newer binary.
+maybe_update_existing_binary() {
+  [ -x "$FREVANA_BIN" ] || return 0
+  [ "${FREVANA_DISABLE_AUTO_UPDATE:-}" != "1" ] || return 0
+  # A pinned version is an explicit request not to float to latest.
+  [ -z "${FREVANA_VERSION:-}" ] || return 0
+
+  local now last_checked age
+  now=$(date +%s)
+  last_checked=$(stat -f %m "$UPDATE_CHECK_FILE" 2>/dev/null || stat -c %Y "$UPDATE_CHECK_FILE" 2>/dev/null || echo 0)
+  age=$(( now - last_checked ))
+  if [ "$age" -ge 0 ] && [ "$age" -lt "$UPDATE_CHECK_TTL_SEC" ]; then
+    return 0
+  fi
+
+  mkdir -p "$(dirname "$UPDATE_CHECK_FILE")"
+  touch "$UPDATE_CHECK_FILE"
+  echo "Checking for Frevana updates..." >&2
+  if ! "$FREVANA_BIN" update; then
+    echo "Warning: automatic update failed; continuing with the installed Frevana binary." >&2
+  fi
+}
+
 # ---------------------------------------------------------------------------
 # --snooze: forward to binary (it owns the snooze state)
 # ---------------------------------------------------------------------------
@@ -263,6 +293,10 @@ if [ ! -x "$FREVANA_BIN" ]; then
   # /tmp/frevana-setup.lock and the next setup.sh run within 5 minutes will
   # incorrectly report "Another installation is in progress".
   rm -rf "$LOCKFILE"
+else
+  # Existing binaries (including 1.1.5) use the stamp file to decide whether
+  # they should invoke their built-in updater before setup-host starts.
+  maybe_update_existing_binary
 fi
 
 # ---------------------------------------------------------------------------
