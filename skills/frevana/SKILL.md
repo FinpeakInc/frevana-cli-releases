@@ -106,6 +106,29 @@ Requirements:
 - The user must be logged in to X in Chrome
 - X search may require a higher timeout for busy topics
 
+## Search Meta Ads Library
+
+Use the dedicated Meta Ads tool for ad research. It returns structured advertisement records rather than generic page text. The country filter defaults to `ALL`; ad category and media type remain set to all. The extension loads results until no new ads are available or the requested limit is reached.
+
+```bash
+bash SKILL_DIR/scripts/frevana-call.sh frevana_meta_ads_search '{"keyword":"nike","country":"CN","active_status":"active","date_from":"2026-01-01","date_to":"2026-06-22","maxResults":20,"timeout":120000}'
+```
+
+Parameters:
+- `keyword` (required) — advertiser name, brand, or ad keyword
+- `country` — `ALL` (default) or an ISO 3166-1 alpha-2 country code: `CN` for China, `AM` for Armenia, `US` for the United States
+- `active_status` — `active`, `inactive`, or `all` (default)
+- `date_from` — Inclusive start date in `YYYY-MM-DD`; defaults to six months before today
+- `date_to` — Inclusive end date in `YYYY-MM-DD`; defaults to today
+- `maxResults` — Maximum number of ads to return (default: 20, max: 500)
+- `timeout` — Timeout in ms (default: 120000; effective range: 10000–180000)
+
+The result includes search metadata plus semantic fields for each ad, such as advertiser, status, dates, ad text, landing-page URL, and creative image/video/card data when available.
+
+Requirements:
+- Chrome must be open with the Frevana extension connected
+- The Meta Ads Library page must be accessible in Chrome; sign in to Facebook if Meta asks for it
+
 ## Publish to social media
 
 ```bash
